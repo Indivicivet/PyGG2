@@ -7,104 +7,104 @@ from functions import sign, place_free, point_direction, load_image
 from shot import Shot
 
 class Weapon(GameObject):
-    def __init__(self, root, x, y):
-        GameObject.__init__(self, root, x, y)
+	def __init__(self, root, x, y):
+		GameObject.__init__(self, root, x, y)
 
-        self.owner = None
-        self.firingSprite = None
+		self.owner = None
+		self.firingSprite = None
 
-        self.ammo = 0
-        self.maxAmmo = 0
-        self.justShot = False
-        self.readyToShoot = True
-        self.refireAlarm = 0
+		self.ammo = 0
+		self.maxAmmo = 0
+		self.justShot = False
+		self.readyToShoot = True
+		self.refireAlarm = 0
 
-        self.direction = 0
+		self.direction = 0
 
-    def step(self, frametime):
-        if self.refireAlarm <= 0:
-            self.refireAlarm = 0
-            self.readyToShoot = True
-        else:
-            self.refireAlarm -= frametime
+	def step(self, frametime):
+		if self.refireAlarm <= 0:
+			self.refireAlarm = 0
+			self.readyToShoot = True
+		else:
+			self.refireAlarm -= frametime
 
-        if self.root.LMB and self.refireAlarm == 0:
-            self.FirePrimary()
+		if self.root.LMB and self.refireAlarm == 0:
+			self.FirePrimary()
 
-        if self.root.RMB and self.refireAlarm == 0:
-            self.FireSecondary()
-
-
-    def endStep(self, frametime):
-        self.rect.topleft = (self.x - self.xRectOffset, self.y - self.yRectOffset)
+		if self.root.RMB and self.refireAlarm == 0:
+			self.FireSecondary()
 
 
-    def posUpdate(self):
-        self.x = self.owner.x
-        self.y = self.owner.y
-        
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-
-        self.direction = point_direction(self.x, self.y, mouse_x + self.root.Xview, mouse_y + self.root.Yview)
-
-    def FirePrimary(self):
-        pass
-
-    def FireSecondary(self):
-        pass
+	def endStep(self, frametime):
+		self.rect.topleft = (self.x - self.xRectOffset, self.y - self.yRectOffset)
 
 
-    def draw(self):
-        if not self.sprite: return
+	def posUpdate(self):
+		self.x = self.owner.x
+		self.y = self.owner.y
+		
+		mouse_x, mouse_y = pygame.mouse.get_pos()
 
-        tempSprite = self.sprite.copy()
+		self.direction = point_direction(self.x, self.y, mouse_x + self.root.Xview, mouse_y + self.root.Yview)
 
-        if self.justShot:
-            self.sprite = self.firingSprite.copy()
+	def FirePrimary(self):
+		pass
 
-        if self.owner.flip:
-            self.sprite = pygame.transform.flip(self.sprite, 0, 1)
+	def FireSecondary(self):
+		pass
 
-        self.sprite = pygame.transform.rotate(self.sprite, self.direction)
-        
-        
-        self.root.Surface.blit(self.sprite, (self.x + self.xImageOffset - self.root.Xview, self.y + self.yImageOffset - self.root.Yview))
-        
-        self.sprite = tempSprite
-        
-        pass
+
+	def draw(self):
+		if not self.sprite: return
+
+		tempSprite = self.sprite.copy()
+
+		if self.justShot:
+			self.sprite = self.firingSprite.copy()
+
+		if self.owner.flip:
+			self.sprite = pygame.transform.flip(self.sprite, 0, 1)
+
+		self.sprite = pygame.transform.rotate(self.sprite, self.direction)
+		
+		
+		self.root.Surface.blit(self.sprite, (self.x + self.xImageOffset - self.root.Xview, self.y + self.yImageOffset - self.root.Yview))
+		
+		self.sprite = tempSprite
+		
+		pass
 
 
 
 class ScatterGun(Weapon):
-    def __init__(self, root, x, y):
-        Weapon.__init__(self, root, x, y)
+	def __init__(self, root, x, y):
+		Weapon.__init__(self, root, x, y)
 
-        self.sprite = load_image("sprites/weapons/scatterguns/0.png")
-        self.rect = self.sprite.get_rect()
-        self.firingSprite = load_image("sprites/weapons/scatterguns/2.png")
+		self.sprite = load_image("sprites/weapons/scatterguns/0.png")
+		self.rect = self.sprite.get_rect()
+		self.firingSprite = load_image("sprites/weapons/scatterguns/2.png")
 
-        self.maxAmmo = 6
-        self.ammo = self.maxAmmo
+		self.maxAmmo = 6
+		self.ammo = self.maxAmmo
 
-        self.refireTime = 0.5
-        self.reloadTime = 1
+		self.refireTime = 0.5
+		self.reloadTime = 1
 
-        self.xImageOffset = -8
-        self.yImageOffset = -8
+		self.xImageOffset = -8
+		self.yImageOffset = -8
 
-    def FirePrimary(self):
-        for i in range(6):
-            shot = Shot(self.root, self.x, self.y)
-            shot.owner = self.owner
-            shot.direction = self.direction + (7 - random.randint(0, 15))
+	def FirePrimary(self):
+		for i in range(6):
+			shot = Shot(self.root, self.x, self.y)
+			shot.owner = self.owner
+			shot.direction = self.direction + (7 - random.randint(0, 15))
 
-            shot.speed = 100 + (20 - random.randint(0, 40))
+			shot.speed = 100 + (20 - random.randint(0, 40))
 
-            radDirection = math.radians(shot.direction)
-            shot.hspeed = math.cos(radDirection) * shot.speed + self.owner.hspeed/2
-            shot.vspeed = math.sin(radDirection) * -shot.speed
+			radDirection = math.radians(shot.direction)
+			shot.hspeed = math.cos(radDirection) * shot.speed + self.owner.hspeed/2
+			shot.vspeed = math.sin(radDirection) * -shot.speed
 
-            shot.speed = math.hypot(shot.hspeed, shot.vspeed)
-            self.refireAlarm = self.refireTime
-            
+			shot.speed = math.hypot(shot.hspeed, shot.vspeed)
+			self.refireAlarm = self.refireTime
+			

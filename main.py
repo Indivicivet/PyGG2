@@ -13,35 +13,37 @@ framerate = 80
 
 # the main function
 def GG2main():
-    # initialize
-    pygame.init()
-    game = GG2()
+	# initialize
+	pygame.init()
+	game = GG2()
 
-    # game loop
-    while True:        
-        # check if user exited the game
-        if QUIT in {event.type for event in pygame.event.get()}:
-            break
-        
-        # handle input
-        key = pygame.key.get_pressed()
-        game.up = key[K_w]
-        game.left = key[K_a]
-        game.right = key[K_d]
+	# game loop
+	while True:		
+		# check if user exited the game
+		if QUIT in {event.type for event in pygame.event.get()}:
+			break
+		
+		# handle input
+		key = pygame.key.get_pressed()
+		game.up = key[K_w]
+		game.left = key[K_a]
+		game.right = key[K_d]
+		game.down = key[K_s]
+		game.toggleConsole = key[K_BACKQUOTE]
 
-        LMB, MMB, RMB = pygame.mouse.get_pressed()
-        game.LMB = LMB
-        game.RMB = RMB
-        
-        # update the game and render
-        game.update(game.clock.get_time() / 1000)
-        game.render()
+		LMB, MMB, RMB = pygame.mouse.get_pressed()
+		game.LMB = LMB
+		game.RMB = RMB
+		
+		# update the game and render
+		game.update(game.clock.get_time() / 1000)
+		game.render()
 
-        # wait to get steady frame rate
-        game.clock.tick(framerate)
-        
-    # clean up
-    pygame.quit()
+		# wait to get steady frame rate
+		game.clock.tick(framerate)
+		
+	# clean up
+	pygame.quit()
 
 # when profiling:
 # cProfile.run("GG2main()")
